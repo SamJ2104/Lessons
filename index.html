@@ -44,128 +44,130 @@
           <div class="lessons"></div>
 
           <script>
-              // Your existing JavaScript code here...
+    // Set this variable to true if you need to flip weeks (e.g., when a week is missed)
+    var flipWeeks = false;
 
-              // Function to update the schedule based on the selected date
-              function updateSchedule(selectedDateObj) {
-                  var selectedDay = selectedDateObj.getDay();
-                  var selectedWeekNumber = getWeekNumber(selectedDateObj);
-                  var selectedWeek = selectedWeekNumber % 2 === 0 ? 2 : 1;
-                  var selectedSchedule = selectedWeek === 2 ? scheduleWeek2 : scheduleWeek1;
-                  var selectedDayName = dayNames[selectedDay];
-                  var selectedLessons = selectedSchedule[selectedDayName].split(', ');
+    // Function to calculate the week number for a given date
+    function getWeekNumber(date) {
+        var oneJan = new Date(date.getFullYear(), 0, 1);
+        var millisecsInDay = 86400000; // Number of milliseconds in a day (24 hours)
+        return Math.ceil(((date - oneJan) / millisecsInDay + oneJan.getDay() + 1) / 7);
+    }
 
-                  document.querySelector(".week").innerHTML = "Week " + selectedWeek;
-                  document.querySelector(".day").innerHTML = selectedDayName;
-                  document.querySelector(".lessons").innerHTML = "";
+    // Example schedule data for Week 1 and Week 2
+    var scheduleWeek1 = {
+        "Monday": "P.E., Spanish, Chemistry, English, Art.",
+        "Tuesday": "French, Food & Nutrition, Geography, English, Maths.",
+        "Wednesday": "English, I.T., Maths, History, PSE.",
+        "Thursday": "Welsh, Maths, Music, P.E., R.E.",
+        "Friday": "Maths, Welsh, D.T., History, English."
+    };
 
-                  for (var i = 0; i < selectedLessons.length; i++) {
-                      document.querySelector(".lessons").innerHTML += "Lesson " + (i + 1) + ": " + selectedLessons[i] + "<br>";
-                  }
-              }
+    var scheduleWeek2 = {
+        "Monday": "English, Music, Drama, Maths, P.E.",
+        "Tuesday": "English, I.T., Art, History, Physics.",
+        "Wednesday": "Biology, R.E., French, Physics, I.T.",
+        "Thursday": "Biology, Geography, Chemistry, Maths, Welsh.",
+        "Friday": "English, Geography, Drama, Maths, D.T."
+    };
 
-              // Function to handle tapping on the right side of the screen
-              function showNextDay() {
-                  currentDate.setDate(currentDate.getDate() + 1);
-                  updateSchedule(currentDate);
-              }
+    // Get the current date
+    var currentDate = new Date();
 
-              // Function to handle tapping on the left side of the screen
-              function showPreviousDay() {
-                  currentDate.setDate(currentDate.getDate() - 1);
-                  updateSchedule(currentDate);
-              }
+    // Get the day of the week (0 - Sunday, 1 - Monday, ..., 6 - Saturday)
+    var currentDay = currentDate.getDay();
 
-              // Add event listeners to detect touches on the sides of the screen
-              document.addEventListener('touchstart', handleTouchStart, false);
-              document.addEventListener('touchmove', handleTouchMove, false);
+    // Get the week number for the current date
+    var currentWeekNumber = getWeekNumber(currentDate);
 
-              var xDown = null;                                                        
-              var yDown = null;                                                        
+    // Determine if it's Week 1 or Week 2 based on the week number, considering flipWeeks
+    var currentWeek = (currentWeekNumber % 2 === 0 ? 2 : 1);
+    if (flipWeeks) currentWeek = currentWeek === 1 ? 2 : 1;
 
-              function handleTouchStart(evt) {                                         
-                  xDown = evt.touches[0].clientX;                                      
-                  yDown = evt.touches[0].clientY;                                      
-              };                                                
+    // Determine the schedule to display based on the current week
+    var currentSchedule = currentWeek === 1 ? scheduleWeek1 : scheduleWeek2;
 
-              function handleTouchMove(evt) {
-                  if ( ! xDown || ! yDown ) {
-                      return;
-                  }
+    // Function to update the schedule based on the selected date
+    function updateSchedule(selectedDateObj) {
+        var selectedDay = selectedDateObj.getDay();
+        var selectedWeekNumber = getWeekNumber(selectedDateObj);
+        var selectedWeek = selectedWeekNumber % 2 === 0 ? 2 : 1;
+        if (flipWeeks) selectedWeek = selectedWeek === 1 ? 2 : 1;
+        var selectedSchedule = selectedWeek === 2 ? scheduleWeek2 : scheduleWeek1;
+        var selectedDayName = dayNames[selectedDay];
+        var selectedLessons = selectedSchedule[selectedDayName].split(', ');
 
-                  var xUp = evt.touches[0].clientX;                                    
-                  var yUp = evt.touches[0].clientY;
-
-                  var xDiff = xDown - xUp;
-                  var yDiff = yDown - yUp;
-
-                  if ( Math.abs( xDiff ) > Math.abs( yDiff ) ) {/*most significant*/
-                      if ( xDiff > 0 ) {
-                          /* left swipe */
-                          showNextDay();
-                      } else {
-                          /* right swipe */
-                          showPreviousDay();
-                      }                       
-                  } 
-
-                  /* reset values */
-                  xDown = null;
-                  yDown = null;                                             
-              };
-
-              // Get the current date
-              var currentDate = new Date();
-
-              // Get the day of the week (0 - Sunday, 1 - Monday, ..., 6 - Saturday)
-              var currentDay = currentDate.getDay();
-
-              // Get the week number for the current date
-              var currentWeekNumber = getWeekNumber(currentDate);
-
-              // Determine if it's Week 1 or Week 2 based on the week number
-              var currentWeek = currentWeekNumber % 2 === 0 ? 2 : 1;
-
-              // Example schedule data for Week 1 and Week 2
-              
-
-              var scheduleWeek1 = {
-                  "Monday": "P.E., Spanish, Chemistry, English, Art.",
-                  "Tuesday": "French, Food & Nutrition, Geography, English, Maths.",
-                  "Wednesday": "English, I.T., Maths, History, PSE.",
-                  "Thursday": "Welsh, Maths, Music, P.E., R.E.",
-                  "Friday": "Maths, Welsh, D.T., History, English."
-              };
-
-              var scheduleWeek2 = {
-                  "Monday": "English, Music, Drama, Maths, P.E.",
-                  "Tuesday": "English, I.T., Art, History, Physics.",
-                  "Wednesday": "Biology, R.E., French, Physics, I.T.",
-                  "Thursday": "Biology, Geography, Chemistry, Maths, Welsh.",
-                  "Friday": "English, Geography, Drama, Maths, D.T."
-              };
-
-              // Determine the schedule to display based on the current week
-              var currentSchedule = currentWeek === 1 ? scheduleWeek1 : scheduleWeek2;
-
-        // Display the schedule for the current week (similar to the previous code)
-        var dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-        var day = dayNames[currentDay];
-        var lessons = currentSchedule[day].split(', ');
-
-        document.querySelector(".week").innerHTML = "Week " + currentWeek;
-        document.querySelector(".day").innerHTML = day;
+        document.querySelector(".week").innerHTML = "Week " + selectedWeek;
+        document.querySelector(".day").innerHTML = selectedDayName;
         document.querySelector(".lessons").innerHTML = "";
-        for (var i = 0; i < lessons.length; i++) {
-            document.querySelector(".lessons").innerHTML += "Lesson " + (i + 1) + ": " + lessons[i] + "<br>";
+
+        for (var i = 0; i < selectedLessons.length; i++) {
+            document.querySelector(".lessons").innerHTML += "Lesson " + (i + 1) + ": " + selectedLessons[i] + "<br>";
+        }
+    }
+
+    // Function to handle tapping on the right side of the screen
+    function showNextDay() {
+        currentDate.setDate(currentDate.getDate() + 1);
+        updateSchedule(currentDate);
+    }
+
+    // Function to handle tapping on the left side of the screen
+    function showPreviousDay() {
+        currentDate.setDate(currentDate.getDate() - 1);
+        updateSchedule(currentDate);
+    }
+
+    // Add event listeners to detect touches on the sides of the screen
+    document.addEventListener('touchstart', handleTouchStart, false);
+    document.addEventListener('touchmove', handleTouchMove, false);
+
+    var xDown = null;                                                        
+    var yDown = null;                                                        
+
+    function handleTouchStart(evt) {                                         
+        xDown = evt.touches[0].clientX;                                      
+        yDown = evt.touches[0].clientY;                                      
+    };                                                
+
+    function handleTouchMove(evt) {
+        if (!xDown || !yDown) {
+            return;
         }
 
-        // Function to calculate the week number for a given date
-        function getWeekNumber(date) {
-            var oneJan = new Date(date.getFullYear(), 0, 1);
-            var millisecsInDay = 86400000; // Number of milliseconds in a day (24 hours)
-            return Math.ceil(((date - oneJan) / millisecsInDay + oneJan.getDay() + 1) / 7);
-        }
-    </script>
+        var xUp = evt.touches[0].clientX;                                    
+        var yUp = evt.touches[0].clientY;
+
+        var xDiff = xDown - xUp;
+        var yDiff = yDown - yUp;
+
+        if (Math.abs(xDiff) > Math.abs(yDiff)) { /*most significant*/
+            if (xDiff > 0) {
+                /* left swipe */
+                showNextDay();
+            } else {
+                /* right swipe */
+                showPreviousDay();
+            }                       
+        } 
+
+        /* reset values */
+        xDown = null;
+        yDown = null;                                             
+    };
+
+    // Display the schedule for the current week
+    var dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+    var day = dayNames[currentDay];
+    var lessons = currentSchedule[day] ? currentSchedule[day].split(', ') : [];
+
+    document.querySelector(".week").innerHTML = "Week " + currentWeek;
+    document.querySelector(".day").innerHTML = day;
+    document.querySelector(".lessons").innerHTML = "";
+    for (var i = 0; i < lessons.length; i++) {
+        document.querySelector(".lessons").innerHTML += "Lesson " + (i + 1) + ": " + lessons[i] + "<br>";
+    }
+// l formatting
+</script>
 </body>
 </html>
